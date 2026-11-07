@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+# runtime data: settings (api_hash), Telegram session (= full account access), catalog
+data/
+*.session
+*.session-journal

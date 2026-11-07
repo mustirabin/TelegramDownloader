@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TelegramDownloader</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">TelegramDownloader</div>
+  <nav>
+    <button data-tab="library" class="tab active">Library</button>
+    <button data-tab="downloads" class="tab">Downloads <span id="activeBadge" class="badge hidden"></span></button>
+    <button data-tab="settings" class="tab">Settings</button>
+  </nav>
+  <div id="tgState" class="state">…</div>
+</header>
+
+<main>
+  <!-- LIBRARY -->
+  <section id="tab-library" class="tabpane">
+    <div class="toolbar">
+      <input id="libSearch" type="search" placeholder="Search series, movies, files…">
+      <button id="openLibrary" class="ghost">Open library folder</button>
+    </div>
+    <div class="libgrid">
+      <aside id="libNav"></aside>
+      <div id="libContent" class="panel"></div>
+    </div>
+  </section>
+
+  <!-- DOWNLOADS -->
+  <section id="tab-downloads" class="tabpane hidden">
+    <div class="toolbar">
+      <input id="linkInput" type="text" placeholder="Paste a link: https://t.me/c/3215507776/11173">
+      <button id="addLink">Download</button>
+      <span class="sep"></span>
+      <select id="dlFilter">
+        <option value="active">Active</option>
+        <option value="failed">Failed / skipped</option>
+        <option value="done">Completed</option>
+        <option value="all">All</option>
+      </select>
+      <button id="scanBtn" class="ghost" title="Look for links/videos in the last N messages of every private chat">Scan history</button>
+      <input id="scanLimit" type="number" value="100" min="1" max="5000" style="width:80px">
+    </div>
+    <div id="scanStatus" class="muted small"></div>
+    <div class="panel">
+      <table class="dl">
+        <thead><tr><th>#</th><th>File</th><th>From</th><th>Status</th><th style="width:30%">Progress</th><th></th></tr></thead>
+        <tbody id="dlBody"></tbody>
+      </table>
+      <div id="dlEmpty" class="empty hidden">Nothing here.</div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" class="tabpane hidden">
+    <div class="cols">
+      <div class="panel">
+        <h2>Telegram account</h2>
+        <div id="loginBox"></div>
+        <h3>API credentials</h3>
+        <p class="muted small">Create once at <a href="https://my.telegram.org/apps" target="_blank" rel="noopener">my.telegram.org → API development tools</a>. Stored only on this PC.</p>
+        <label>api_id <input id="s_api_id" type="number"></label>
+        <label>api_hash <input id="s_api_hash" type="password" autocomplete="off" placeholder="(unchanged)"></label>
+        <button id="saveApi">Save &amp; connect</button>
+      </div>
+      <div class="panel">
+        <h2>Downloads</h2>
+        <label>Library folder <input id="s_library_dir" type="text"></label>
+        <p class="muted small">Changing the folder does not move files already downloaded.</p>
+        <label>Downloads at the same time <input id="s_max_concurrent_downloads" type="number" min="1" max="10"></label>
+        <label class="check"><input id="s_auto_download" type="checkbox"> Start downloading automatically when a file/link arrives</label>
+        <h3>Which private chats to watch</h3>
+        <label class="check"><input type="radio" name="watch_mode" value="all_private"> All private chats</label>
+        <label class="check"><input type="radio" name="watch_mode" value="allowlist"> Only these chats (one per line: @username, user id, or name)</label>
+        <textarea id="s_allowed_chats" rows="4" placeholder="@somebot&#10;123456789&#10;Saved Messages"></textarea>
+        <label class="check"><input id="s_include_saved_messages" type="checkbox"> Include my Saved Messages</label>
+        <label class="check"><input id="s_include_bots" type="checkbox"> Include chats with bots</label>
+        <h3>File types</h3>
+        <label>Video extensions <input id="s_video_extensions" type="text"></label>
+        <label class="check"><input id="s_download_all_documents" type="checkbox"> Download any document, not only videos</label>
+        <button id="saveSettings">Save settings</button>
+        <span id="saveMsg" class="muted small"></span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="playerDlg">
+  <div class="dlghead"><span id="playerTitle" dir="auto"></span><button class="ghost" data-close>✕</button></div>
+  <video id="player" controls preload="metadata"></video>
+  <p class="muted small">If the video doesn't play (codec not supported by the browser), use “Open” to play it in your default player.</p>
+</dialog>
+
+<dialog id="editDlg">
+  <form method="dialog" id="editForm">
+    <div class="dlghead"><span>Move / rename</span><button class="ghost" value="cancel" data-close>✕</button></div>
+    <p id="editFile" class="muted small" dir="auto"></p>
+    <label>Type
+      <select name="kind"><option value="episode">Series episode</option><option value="movie">Movie</option><option value="unsorted">Unsorted</option></select>
+    </label>
+    <label>Title <input name="title" dir="auto"></label>
+    <div class="row3">
+      <label class="ep">Season <input name="season" type="number" min="0"></label>
+      <label class="ep">Episode <input name="episode" type="number" min="0"></label>
+      <label>Year <input name="year" type="number" min="1900" max="2100"></label>
+    </div>
+    <div class="right"><button value="save" id="editSave">Save</button></div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>
